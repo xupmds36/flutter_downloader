@@ -95,6 +95,7 @@ class FlutterDownloader {
     required String url,
     required String savedDir,
     String? fileName,
+    String? additionalInfo,
     Map<String, String> headers = const {},
     bool showNotification = true,
     bool openFileFromNotification = true,
@@ -111,6 +112,7 @@ class FlutterDownloader {
         'url': url,
         'saved_dir': savedDir,
         'file_name': fileName,
+        'additional_info': additionalInfo,
         'headers': jsonEncode(headers),
         'show_notification': showNotification,
         'open_file_from_notification': openFileFromNotification,
@@ -157,6 +159,7 @@ class FlutterDownloader {
             progress: item['progress'] as int,
             url: item['url'] as String,
             filename: item['file_name'] as String?,
+            additionalInfo: item['additional_info'] as String?,
             savedDir: item['saved_dir'] as String,
             timeCreated: item['time_created'] as int,
 
@@ -215,6 +218,7 @@ class FlutterDownloader {
             progress: item['progress'] as int,
             url: item['url'] as String,
             filename: item['file_name'] as String?,
+            additionalInfo: item['additional_info'] as String?,
             savedDir: item['saved_dir'] as String,
             timeCreated: item['time_created'] as int,
 

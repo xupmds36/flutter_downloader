@@ -85,6 +85,7 @@ class FlutterDownloaderPlugin : MethodChannel.MethodCallHandler, FlutterPlugin {
         url: String?,
         savedDir: String?,
         filename: String?,
+        additionalInfo: String?,
         headers: String?,
         showNotification: Boolean,
         openFileFromNotification: Boolean,
@@ -108,6 +109,7 @@ class FlutterDownloaderPlugin : MethodChannel.MethodCallHandler, FlutterPlugin {
                     .putString(DownloadWorker.ARG_URL, url)
                     .putString(DownloadWorker.ARG_SAVED_DIR, savedDir)
                     .putString(DownloadWorker.ARG_FILE_NAME, filename)
+                    .putString(DownloadWorker.ARG_ADDITIONAL_INFO, additionalInfo)
                     .putString(DownloadWorker.ARG_HEADERS, headers)
                     .putBoolean(DownloadWorker.ARG_SHOW_NOTIFICATION, showNotification)
                     .putBoolean(
@@ -163,6 +165,7 @@ class FlutterDownloaderPlugin : MethodChannel.MethodCallHandler, FlutterPlugin {
         val url: String = call.requireArgument("url")
         val savedDir: String = call.requireArgument("saved_dir")
         val filename: String? = call.argument("file_name")
+        val additionalInfo: String? = call.argument("additional_info")
         val headers: String = call.requireArgument("headers")
         val timeout: Int = call.requireArgument("timeout")
         val showNotification: Boolean = call.requireArgument("show_notification")
@@ -174,6 +177,7 @@ class FlutterDownloaderPlugin : MethodChannel.MethodCallHandler, FlutterPlugin {
             url,
             savedDir,
             filename,
+            additionalInfo,
             headers,
             showNotification,
             openFileFromNotification,
@@ -193,6 +197,7 @@ class FlutterDownloaderPlugin : MethodChannel.MethodCallHandler, FlutterPlugin {
             DownloadStatus.ENQUEUED,
             0,
             filename,
+            additionalInfo,
             savedDir,
             headers,
             showNotification,
@@ -212,6 +217,7 @@ class FlutterDownloaderPlugin : MethodChannel.MethodCallHandler, FlutterPlugin {
             item["progress"] = task.progress
             item["url"] = task.url
             item["file_name"] = task.filename
+            item["additional_info"] = task.additionalInfo
             item["saved_dir"] = task.savedDir
             item["time_created"] = task.timeCreated
             item["allow_cellular"] = task.allowCellular
@@ -231,6 +237,7 @@ class FlutterDownloaderPlugin : MethodChannel.MethodCallHandler, FlutterPlugin {
             item["progress"] = task.progress
             item["url"] = task.url
             item["file_name"] = task.filename
+            item["additional_info"] = task.additionalInfo
             item["saved_dir"] = task.savedDir
             item["time_created"] = task.timeCreated
             item["allow_cellular"] = task.allowCellular
@@ -278,6 +285,7 @@ class FlutterDownloaderPlugin : MethodChannel.MethodCallHandler, FlutterPlugin {
                         task.url,
                         task.savedDir,
                         task.filename,
+                        task.additionalInfo,
                         task.headers,
                         task.showNotification,
                         task.openFileFromNotification,
@@ -322,7 +330,7 @@ class FlutterDownloaderPlugin : MethodChannel.MethodCallHandler, FlutterPlugin {
         if (task != null) {
             if (task.status == DownloadStatus.FAILED || task.status == DownloadStatus.CANCELED) {
                 val request: WorkRequest = buildRequest(
-                    task.url, task.savedDir, task.filename,
+                    task.url, task.savedDir, task.filename, task.additionalInfo,
                     task.headers, task.showNotification, task.openFileFromNotification,
                     false, requiresStorageNotLow, task.saveInPublicStorage, timeout, allowCellular = task.allowCellular
                 )
