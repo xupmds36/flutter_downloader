@@ -7,6 +7,7 @@ import android.provider.BaseColumns
 
 class TaskDbHelper private constructor(context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(SQL_CREATE_ENTRIES)
     }
@@ -15,28 +16,28 @@ class TaskDbHelper private constructor(context: Context) :
         update1to2(db, oldVersion)
         update2to3(db, oldVersion)
         update3to4(db, oldVersion)
+        update4to5(db, oldVersion)
     }
 
     private fun update1to2(db: SQLiteDatabase, oldVersion: Int) {
-        if (oldVersion > 1) {
-            return
-        }
+        if (oldVersion > 1) return
         db.execSQL(SQL_DELETE_ENTRIES)
         onCreate(db)
     }
 
     private fun update2to3(db: SQLiteDatabase, oldVersion: Int) {
-        if (oldVersion > 2) {
-            return
-        }
+        if (oldVersion > 2) return
         db.execSQL("ALTER TABLE " + TaskEntry.TABLE_NAME + " ADD COLUMN " + TaskEntry.COLUMN_SAVE_IN_PUBLIC_STORAGE + " TINYINT DEFAULT 0")
     }
 
     private fun update3to4(db: SQLiteDatabase, oldVersion: Int) {
-        if (oldVersion > 3) {
-            return
-        }
+        if (oldVersion > 3) return
         db.execSQL("ALTER TABLE ${TaskEntry.TABLE_NAME} ADD COLUMN ${TaskEntry.COLUMN_ALLOW_CELLULAR} TINYINT DEFAULT 1")
+    }
+
+    private fun update4to5(db: SQLiteDatabase, oldVersion: Int) {
+        if (oldVersion > 4) return
+        db.execSQL("ALTER TABLE ${TaskEntry.TABLE_NAME} ADD COLUMN ${TaskEntry.COLUMN_NAME_ADDITIONAL_INFO} TEXT DEFAULT NULL")
     }
 
     override fun onDowngrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -44,9 +45,10 @@ class TaskDbHelper private constructor(context: Context) :
     }
 
     companion object {
-        const val DATABASE_VERSION = 4
+        const val DATABASE_VERSION = 5
         const val DATABASE_NAME = "download_tasks.db"
         private var instance: TaskDbHelper? = null
+
         private const val SQL_CREATE_ENTRIES = (
             "CREATE TABLE " + TaskEntry.TABLE_NAME + " (" +
                 BaseColumns._ID + " INTEGER PRIMARY KEY," +
@@ -67,12 +69,10 @@ class TaskDbHelper private constructor(context: Context) :
                 TaskEntry.COLUMN_ALLOW_CELLULAR + " TINYINT DEFAULT 1" +
                 ")"
             )
+
         private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${TaskEntry.TABLE_NAME}"
 
         fun getInstance(ctx: Context?): TaskDbHelper {
-            // Use the application context, which will ensure that you
-            // don't accidentally leak an Activity's context.
-            // See this article for more information: http://bit.ly/6LRzfx
             if (instance == null) {
                 instance = TaskDbHelper(ctx!!.applicationContext)
             }
